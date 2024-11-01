@@ -11,8 +11,9 @@ pip install -r requirements.txt
 The implementation is based on PyTorch.
 We recommend to install PyTorch independently, according to the specifics of your system, as suggested on [PyTorch website](https://pytorch.org/get-started/locally/).
 These packages are necessary to run the code:
-- PyTorch
--
+- numpy
+- pandas 
+- pytorch
 
 
 ## Setup
