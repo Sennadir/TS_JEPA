@@ -3,9 +3,17 @@
 This is the official implementation of our "TS-JEPA" which was proposed on "Joint Embedding go Temporal".
 
 ## Requirements
-The implementation is based on PyTorch. This additional list of packages is also necessary to run the code:
+
+Requirements can be installed automatically by running
+```
+pip install -r requirements.txt
+```
+The implementation is based on PyTorch.
+We recommend to install PyTorch independently, according to the specifics of your system, as suggested on [PyTorch website](https://pytorch.org/get-started/locally/).
+These packages are necessary to run the code:
 - PyTorch
 -
+
 
 ## Setup
 The code's folder should be divided into the following subfolders:
