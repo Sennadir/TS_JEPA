@@ -12,7 +12,7 @@ The implementation is based on PyTorch.
 We recommend to install PyTorch independently, according to the specifics of your system, as suggested on [PyTorch website](https://pytorch.org/get-started/locally/).
 These packages are necessary to run the code:
 - numpy
-- pandas 
+- pandas
 - pytorch
 
 
@@ -43,7 +43,7 @@ python pretrain.py --data weather --batch_size 32 --lr 1e-07 --ema_momentum 0.99
 This command will create a checkpoint model in the Logs folder. To Evaluate the pre-trained model on predicting the last value downstream task, the user can do the following command:
 
 ```python
-python eval_forecast_last_pred.py --data weather --batch_size 32 --lr 1e-04 --lr_pretrain 1e-06 --mask_ratio 0.7 --ema_pretrain 0.998 --ratio_patches 10 --checkpoint_to_use 5000 --pretrain_encoder_embed_dim 128 --pretrain_encoder_nhead 2 --pretrain_encoder_num_layers 1 --pretrain_encoder_kernel_size 3 --pretrain_decoder_embed_dim 128 --pretrain_decoder_nhead 2 --pretrain_decoder_num_layers 1
+python eval_forecast_last_pred.py --data weather --batch_size 32 --lr 1e-04 --lr_pretrain 1e-07 --mask_ratio 0.7 --ema_pretrain 0.998 --ratio_patches 10 --checkpoint_to_use 5000 --pretrain_encoder_embed_dim 128 --pretrain_encoder_nhead 2 --pretrain_encoder_num_layers 1 --pretrain_encoder_kernel_size 3 --pretrain_decoder_embed_dim 128 --pretrain_decoder_nhead 2 --pretrain_decoder_num_layers 1
 ```
 
 ## Details
