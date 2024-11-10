@@ -109,6 +109,8 @@ def prepare_args(config):
 
     config["notes"] = args.notes
 
+    config["path_save"] = "./logs/output_model/" + args.data
+
     return config
 
 

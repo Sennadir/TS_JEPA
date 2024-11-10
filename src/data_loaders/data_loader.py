@@ -12,19 +12,16 @@ import numpy as np
 
 import torch
 
-def get_jepa_loaders(path,
-                     batch_size,
-                     ratio_patches=10,
-                     series_split_size=320,
-                     mask_ratio=0.9):
+
+def get_jepa_loaders(path, batch_size, ratio_patches=10, mask_ratio=0.9):
     """
         Load and prepare the data to be used with the TS-JEPA
     """
-
     dataloader = CSVDataLoader(path_data=path,
-                               series_split_size=series_split_size,
-                               patch_size=32,
-                               mask_ratio=mask_ratio)
+                              series_split_size=320,
+                              patch_size=32,
+                              mask_ratio=mask_ratio)
+
     dataloader = DataLoader(dataloader,
                             batch_size=batch_size,
                             shuffle=True)
