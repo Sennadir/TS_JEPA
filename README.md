@@ -1,6 +1,8 @@
 # TS-JEPA: Joint Embedding goes Temporal.
 
-This is the official implementation of our "TS-JEPA" which was proposed on "Joint Embedding go Temporal".
+This is the official implementation of our "TS-JEPA" which was proposed on ["Joint Embedding go Temporal"](https://openreview.net/forum?id=FIdbozebmy), at the NeurIPS Workshop on Time Series in the Age of Large Models.
+
+![architecture](assets/jepa_architecture.png)
 
 ## Requirements
 
