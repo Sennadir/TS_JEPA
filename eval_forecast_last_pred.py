@@ -24,6 +24,7 @@ from src.models.encoder import Encoder
 from src.models.decoder import LinearDecoder
 
 import warnings
+
 warnings.filterwarnings("ignore")
 
 
@@ -42,25 +43,28 @@ if __name__ == "__main__":
     # Init Encoder, Decoder, Optimizer
 
     # Load Data
-    print('Load data')
+    print("Load data")
     config["path_data"] = "./data/" + config["data"] + "/" + config["data"] + ".csv"
 
-    loader = get_evaluation_loaders(config["path_data"],
-                                        config["batch_size"],
-                                        config["ratio_patches"],
-                                        config["mask_ratio"])
+    loader = get_evaluation_loaders(
+        config["path_data"],
+        config["batch_size"],
+        config["ratio_patches"],
+        config["mask_ratio"],
+    )
 
     input_dim = len(loader.dataset[0][0][0])
     # Encoder
-    encoder = Encoder(num_patches=len(loader.dataset[0][0]),
-                        dim_in=input_dim,
-                        kernel_size=config["pretrain_encoder_kernel_size"],
-                        embed_dim=config["pretrain_encoder_embed_dim"],
-                        embed_bias=config["pretrain_encoder_embed_bias"],
-                        nhead=config["pretrain_encoder_nhead"],
-                        num_layers=config["pretrain_encoder_num_layers"],
-                        jepa=True
-                     )
+    encoder = Encoder(
+        num_patches=len(loader.dataset[0][0]),
+        dim_in=input_dim,
+        kernel_size=config["pretrain_encoder_kernel_size"],
+        embed_dim=config["pretrain_encoder_embed_dim"],
+        embed_bias=config["pretrain_encoder_embed_bias"],
+        nhead=config["pretrain_encoder_nhead"],
+        num_layers=config["pretrain_encoder_num_layers"],
+        jepa=True,
+    )
 
     decoder = LinearDecoder(emb_dim=config["pretrain_encoder_embed_dim"], patch_size=32)
 
@@ -71,28 +75,44 @@ if __name__ == "__main__":
     #         + str(config["pretrain_encoder_num_layers"]) \
     #         + "_epoch_" + str(config["checkpoint_to_use"])
 
-    path_name = "/lr_" + str(config["lr_pretrain"]) \
-        + "_ema_momentum_" + str(config["ema_pretrain"]) \
-        + "_mask_ratio_" + str(config["mask_ratio"]) \
-        + "_ratio_patches_" + str(config["ratio_patches"]) \
-        + "_encoder_" + str(config["pretrain_encoder_embed_dim"]) + "_" + str(config["pretrain_encoder_nhead"]) + "_" + str(config["pretrain_encoder_num_layers"]) \
-        + "_predictor_" + str(config["pretrain_decoder_embed_dim"]) + "_" + str(config["pretrain_decoder_nhead"]) + "_" + str(config["pretrain_decoder_num_layers"]) \
-        + "_epoch_" + str(config["checkpoint_to_use"])
+    path_name = (
+        "/lr_"
+        + str(config["lr_pretrain"])
+        + "_ema_momentum_"
+        + str(config["ema_pretrain"])
+        + "_mask_ratio_"
+        + str(config["mask_ratio"])
+        + "_ratio_patches_"
+        + str(config["ratio_patches"])
+        + "_encoder_"
+        + str(config["pretrain_encoder_embed_dim"])
+        + "_"
+        + str(config["pretrain_encoder_nhead"])
+        + "_"
+        + str(config["pretrain_encoder_num_layers"])
+        + "_predictor_"
+        + str(config["pretrain_decoder_embed_dim"])
+        + "_"
+        + str(config["pretrain_decoder_nhead"])
+        + "_"
+        + str(config["pretrain_decoder_num_layers"])
+        + "_epoch_"
+        + str(config["checkpoint_to_use"])
+    )
 
-
-    name_loader = torch.load(config["path_save"] + path_name + ".pt",
-                                map_location=torch.device('cpu'))["encoder"]
+    name_loader = torch.load(
+        config["path_save"] + path_name + ".pt", map_location=torch.device("cpu")
+    )["encoder"]
     encoder.load_state_dict(name_loader)
     print("Model loaded")
 
     # We consider training only the decoder head
-    param_groups = [
-        {'params' : (p for n, p in decoder.named_parameters())}]
+    param_groups = [{"params": (p for n, p in decoder.named_parameters())}]
 
     optimizer = torch.optim.AdamW(param_groups, lr=config["lr"])
 
     # We train the model on the train set
-    print('start train')
+    print("start train")
     for epoch in range(num_epochs):
         encoder.eval()
         decoder.train()
@@ -102,20 +122,20 @@ if __name__ == "__main__":
             encoded_patches = encoder(context_patches)
             summed_embedding = torch.sum(encoded_patches, dim=1)
             predicted_next_patch = decoder(summed_embedding)
-            loss = torch.nn.functional.mse_loss(predicted_next_patch,
-                                            target_patch, reduction="mean")
+            loss = torch.nn.functional.mse_loss(
+                predicted_next_patch, target_patch, reduction="mean"
+            )
 
             loss.backward()
             optimizer.step()
 
-            total_loss += loss/config["batch_size"]
+            total_loss += loss / config["batch_size"]
         if epoch % 10 == 0:
-            print('Epoch: {} - Total loss: {}' .format(epoch, total_loss))
-
+            print("Epoch: {} - Total loss: {}".format(epoch, total_loss))
 
     # We test the model on the last prediction
     # We define the number of steps we will have
-    num_steps = (len(loader.dataset.test_df[context * num_patches:])) // context
+    num_steps = (len(loader.dataset.test_df[context * num_patches :])) // context
 
     predictions = []
     total_diff = 0
@@ -123,8 +143,18 @@ if __name__ == "__main__":
     l_val_mae = []
     for step in range(num_steps):
         # Encode the current context patches
-        current_context = loader.dataset.test_df[context * step: context * num_patches + context * step].reshape(num_patches, context).unsqueeze(0)
-        target_value = loader.dataset.test_df[context * num_patches + step * context: context * num_patches + (step + 1) * context]
+        current_context = (
+            loader.dataset.test_df[
+                context * step : context * num_patches + context * step
+            ]
+            .reshape(num_patches, context)
+            .unsqueeze(0)
+        )
+        target_value = loader.dataset.test_df[
+            context * num_patches
+            + step * context : context * num_patches
+            + (step + 1) * context
+        ]
 
         encoded_patches = encoder(current_context)
 
@@ -135,12 +165,15 @@ if __name__ == "__main__":
         predicted_next_patch = decoder(summed_embedding)
 
         # Compute the Loss
-        val_mse = mse(predicted_next_patch.flatten().detach().numpy(), target_value.numpy())
-        val_mae = mae(predicted_next_patch.flatten().detach().numpy(), target_value.numpy())
+        val_mse = mse(
+            predicted_next_patch.flatten().detach().numpy(), target_value.numpy()
+        )
+        val_mae = mae(
+            predicted_next_patch.flatten().detach().numpy(), target_value.numpy()
+        )
 
         l_val_mse.append(val_mse)
         l_val_mae.append(val_mae)
 
-
-    print("MSE Loss is: {}" .format(np.mean(val_mse)))
-    print("MAE Loss is: {}" .format(np.mean(l_val_mae)))
+    print("MSE Loss is: {}".format(np.mean(val_mse)))
+    print("MAE Loss is: {}".format(np.mean(l_val_mae)))

@@ -10,6 +10,7 @@ import torch.nn as nn
 import numpy as np
 from .utils.modules import *
 
+
 class LinearDecoder(nn.Module):
     def __init__(self, emb_dim, patch_size):
         super(LinearDecoder, self).__init__()
